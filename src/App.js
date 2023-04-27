@@ -3,18 +3,22 @@ import { Fragment, useState } from "react";
 const App = () => {
   const [movie, setMovie] = useState("");
   const [date, setDate] = useState("");
-  const [data, setData] = useState([]);
+  // const [data, setData] = useState([]);
+  const [fetchdata , setFectchData] =useState([]);
 
-  const submitHandler = () => {
+  const submitHandler = (e) => {
+    e.preventDefault();
     const list ={
         title: movie, 
         detail: date,
     }
-    setData(list);
-    sendData();
+    sendData(list);
+
+    setDate("");
+    setMovie("");
   };
 
-  async function sendData(){
+  async function sendData(data){
     const response = await fetch('https://react-http-f2e92-default-rtdb.firebaseio.com//movies.json', {
         method: 'POST',
         body: JSON.stringify(data),
@@ -25,8 +29,6 @@ const App = () => {
 
     const det = await response.json();
 
-    setMovie("");
-    setDate("");
     console.log(det);
   }
 
@@ -43,17 +45,18 @@ const App = () => {
             detail: det[key].detail,
         })
     }
-    setData(load);
+    setFectchData(load);
 
   }
 
   let content=<h1>nothing to show- fetch it</h1>;
 
-  if(data.length > 0){
-    content = data.map((e) => {
+  if(fetchdata.length > 0){
+    content = fetchdata.map((e) => {
         return (<>
          <h2>{e.title}</h2>
         <h2>{e.detail}</h2>
+        <h1>----------</h1>
         </>)
        
     });
@@ -64,7 +67,9 @@ const App = () => {
 
   return (
     <Fragment>
+      <form onSubmit={submitHandler}>
       <input
+        required
         type="text"
         value={movie}
         placeholder="enter the movie name"
@@ -73,6 +78,7 @@ const App = () => {
         }}
       ></input>
       <input
+      required
       value={date}
         type="text"
         placeholder="enter the year of the movie"
@@ -80,7 +86,10 @@ const App = () => {
           setDate(e.target.value);
         }}
       ></input>
-      <button  onClick={submitHandler}>Submit data </button>
+      <button type="submit">Submit data </button>
+
+      </form>
+     
       <button onClick={fetchHandler}> Fetch data</button>
       {content}
     </Fragment>
